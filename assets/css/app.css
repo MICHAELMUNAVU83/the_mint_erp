@@ -1,0 +1,49 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    color: #0b3938;
+    font-feature-settings: "cv11", "tnum";
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-yellow px-3.5 py-2 text-sm
+           font-semibold text-brand-ink border-2 border-brand-ink shadow-[2px_2px_0_#0B3938] hover:bg-brand-dark
+           active:translate-x-[1px] active:translate-y-[1px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-40 transition;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-brand-ink/80 bg-white px-3.5 py-2
+           text-sm font-medium text-brand-ink hover:bg-brand-yellow/30 transition;
+  }
+
+  .field {
+    @apply block w-full rounded-lg border-zinc-200 text-sm placeholder:text-zinc-400 focus:border-brand-ink focus:ring-2 focus:ring-brand-yellow;
+  }
+
+  .card {
+    @apply rounded-xl border-2 border-brand-ink bg-white shadow-[3px_3px_0_#0B3938];
+  }
+
+  .chip {
+    @apply rounded-full px-3 py-1 text-sm text-zinc-500 hover:text-zinc-900 transition;
+  }
+
+  .chip-active {
+    @apply bg-brand-ink text-brand-yellow hover:text-brand-yellow;
+  }
+
+  .brand-title {
+    @apply font-display tracking-wide text-brand-ink;
+  }
+}

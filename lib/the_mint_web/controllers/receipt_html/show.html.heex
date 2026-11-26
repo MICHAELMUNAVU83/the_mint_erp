@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Receipt #{@sale.id} · The Mint</title>
+    <style>
+      @page { size: 80mm auto; margin: 4mm; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #f4f4f5; color: #111; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+      .receipt { width: 80mm; max-width: 100%; margin: 16px auto; background: #fff; padding: 14px; }
+      h1 { font-size: 18px; text-align: center; margin: 0; }
+      .center { text-align: center; }
+      .muted { color: #555; font-size: 11px; }
+      .row { display: flex; justify-content: space-between; gap: 8px; }
+      .rule { border-top: 1px dashed #999; margin: 8px 0; }
+      .total { font-size: 16px; font-weight: 700; }
+      .actions { text-align: center; margin: 12px; }
+      .actions button { font: inherit; padding: 8px 16px; cursor: pointer; }
+      @media print { body { background: #fff; } .receipt { margin: 0; padding: 0; width: auto; } .actions { display: none; } }
+    </style>
+  </head>
+  <body>
+    <div class="receipt">
+      <h1>The Mint Liquor Store</h1>
+      <p class="center muted">Lumumba Drive, TRM · Sales receipt</p>
+      <div class="rule"></div>
+      <div class="row"><span>Receipt #</span><span>{@sale.id}</span></div>
+      <div class="row">
+        <span>Date</span><span>{Calendar.strftime(@sale.inserted_at, "%d %b %Y %H:%M")}</span>
+      </div>
+      <div :if={@sale.user} class="row">
+        <span>Served by</span><span>{@sale.user.name || @sale.user.email}</span>
+      </div>
+      <div class="rule"></div>
+      <div :for={i <- @sale.items}>
+        <div>{i.product_name}</div>
+        <div class="row muted">
+          <span>{i.quantity} × {fmt(i.unit_price)}</span><span>{fmt(i.subtotal)}</span>
+        </div>
+      </div>
+      <div class="rule"></div>
+      <div class="row total"><span>TOTAL (KES)</span><span>{fmt(@sale.total_amount)}</span></div>
+      <div class="row">
+        <span>Paid ({Sale.method_label(@sale.payment_method)})</span>
+        <span>{fmt(@sale.amount_paid || @sale.total_amount)}</span>
+      </div>
+      <div :if={change(@sale)} class="row">
+        <span>Change</span><span>{fmt(change(@sale))}</span>
+      </div>
+      <div :if={@sale.payment_reference} class="row">
+        <span>Ref</span><span>{@sale.payment_reference}</span>
+      </div>
+      <div class="rule"></div>
+      <p class="center">Thank you!</p>
+    </div>
+    <div class="actions">
+      <button onclick="window.print()">Print</button>
+      <button onclick="window.close()">Close</button>
+    </div>
+    <script :if={@autoprint}>
+      window.addEventListener("load", () => window.print());
+    </script>
+  </body>
+</html>

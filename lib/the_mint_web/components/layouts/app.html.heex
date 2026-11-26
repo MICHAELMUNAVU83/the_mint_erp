@@ -1,0 +1,55 @@
+<header class="sticky top-0 z-40 border-b-2 border-brand-ink bg-brand">
+  <div class="mx-auto max-w-[1600px] px-6 h-14 flex items-center gap-6">
+    <.link navigate={~p"/"} class="flex items-center gap-2 shrink-0">
+      <img
+        src={~p"/images/the-mint-logo.png"}
+        alt="The Mint Liquor Store"
+        class="h-10 w-auto max-w-[6.5rem] object-contain"
+      />
+      <span class="hidden font-display text-xl text-brand-ink sm:inline">The Mint ERP</span>
+    </.link>
+    <nav class="flex items-center gap-1 text-sm overflow-x-auto">
+      <.link
+        :for={
+          {label, path} <-
+            [
+              {"New Sale", ~p"/"},
+              {"Products", ~p"/products"},
+              {"Sales", ~p"/sales"}
+            ] ++
+              if(TheMint.Accounts.User.admin?(assigns[:current_user]),
+                do: [
+                  {"Dashboard", ~p"/dashboard"},
+                  {"Users", ~p"/users"},
+                  {"Settings", ~p"/settings"},
+                  {"User Guide", ~p"/guide"}
+                ],
+                else: []
+              )
+        }
+        navigate={path}
+        class={[
+          "px-3 py-1.5 rounded-md whitespace-nowrap transition",
+          if(assigns[:page_title] == label,
+            do: "bg-brand-ink text-brand-yellow font-semibold",
+            else: "text-brand-ink/70 hover:text-brand-ink"
+          )
+        ]}
+      >
+        {label}
+      </.link>
+    </nav>
+    <div class="ml-auto flex items-center gap-4 text-sm shrink-0">
+      <span :if={assigns[:current_user]} class="hidden sm:inline text-brand-ink/70">
+        {@current_user.name || @current_user.email}
+      </span>
+      <.link href={~p"/logout"} method="delete" class="text-brand-ink/70 hover:text-brand-ink">
+        Log out
+      </.link>
+    </div>
+  </div>
+</header>
+<main class="mx-auto max-w-[1600px] px-6 py-8">
+  <.flash_group flash={@flash} />
+  {@inner_content}
+</main>

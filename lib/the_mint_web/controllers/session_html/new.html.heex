@@ -1,0 +1,48 @@
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <img
+        src={~p"/images/the-mint-logo.png"}
+        alt="The Mint Liquor Store"
+        class="mx-auto h-32 w-auto max-w-full object-contain"
+      />
+      <h1 class="mt-4 text-3xl brand-title">The Mint ERP</h1>
+      <p class="text-sm text-brand-ink/60">Sign in to start selling</p>
+    </div>
+
+    <p :if={@error_message} class="mb-4 rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      {@error_message}
+    </p>
+    <.flash_group flash={@flash} />
+
+    <form action={~p"/login"} method="post" class="card p-6 space-y-4">
+      <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+      <div>
+        <label for="email" class="block text-sm font-medium text-zinc-700 mb-1.5">Email</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          required
+          autofocus
+          autocomplete="email"
+          class="field"
+        />
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-zinc-700 mb-1.5">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          required
+          autocomplete="current-password"
+          class="field"
+        />
+      </div>
+      <button type="submit" class="btn-primary w-full py-2.5">Sign in</button>
+    </form>
+  </div>
+</div>

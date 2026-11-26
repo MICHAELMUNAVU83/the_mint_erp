@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="The Mint ERP" suffix=" · The Mint">
+      {assigns[:page_title]}
+    </.live_title>
+    <meta
+      name="description"
+      content="The Mint ERP – point of sale and stock management for The Mint Liquor Store."
+    />
+    <meta
+      name="robots"
+      content={if assigns[:current_user], do: "noindex, nofollow", else: "index, follow"}
+    />
+    <meta name="theme-color" content="#43B8B5" />
+    <link
+      rel="canonical"
+      href={"https://themint.pixiematch.com" <> Phoenix.Controller.current_path(@conn, %{})}
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Mint ERP" />
+    <meta property="og:title" content={assigns[:page_title] || "The Mint ERP"} />
+    <meta property="og:description" content="Point of sale for The Mint Liquor Store." />
+    <meta property="og:url" content="https://themint.pixiematch.com" />
+    <meta property="og:image" content="https://themint.pixiematch.com/images/the-mint-logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="https://themint.pixiematch.com/images/the-mint-logo.png" />
+    <link rel="icon" href={~p"/favicon.ico"} sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href={~p"/images/icon-32.png"} />
+    <link rel="apple-touch-icon" href={~p"/images/icon-180.png"} />
+    <link rel="manifest" href={~p"/site.webmanifest"} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+  <body class="bg-[#EFFAF8] antialiased text-brand-ink">
+    {@inner_content}
+  </body>
+</html>

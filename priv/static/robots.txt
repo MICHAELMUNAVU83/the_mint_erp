@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /login
+Disallow: /
+
+Sitemap: https://themint.pixiematch.com/sitemap.xml
