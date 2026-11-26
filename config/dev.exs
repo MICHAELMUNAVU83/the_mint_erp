@@ -5,7 +5,7 @@ config :the_mint, TheMint.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "the_mint_dev",
+  database: "the_mint_erp_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
