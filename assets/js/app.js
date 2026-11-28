@@ -15,13 +15,22 @@ window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 // Print a receipt from a hidden iframe so the cashier never leaves the POS.
-// The receipt page autoprints itself on load.
+// The parent triggers print: some browsers (Brave on Windows) ignore print() called from inside the frame.
+// If that fails, fall back to opening the receipt in a tab, which autoprints.
 window.addEventListener("phx:print_receipt", ({ detail }) => {
   document.getElementById("receipt-print-frame")?.remove()
   const frame = document.createElement("iframe")
   frame.id = "receipt-print-frame"
   frame.style.cssText = "position:fixed;left:-10000px;top:0;width:400px;height:800px;border:0"
-  frame.src = detail.url
+  frame.addEventListener("load", () => {
+    try {
+      frame.contentWindow.focus()
+      frame.contentWindow.print()
+    } catch (_e) {
+      window.open(detail.url, "_blank")
+    }
+  })
+  frame.src = detail.url + "?print=0"
   document.body.appendChild(frame)
 })
 
