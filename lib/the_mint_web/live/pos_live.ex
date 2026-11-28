@@ -134,6 +134,20 @@ defmodule TheMintWeb.PosLive do
     end
   end
 
+  def handle_event("print_receipt", %{"id" => id}, socket) do
+    {:noreply, push_event(socket, "print_receipt", %{url: ~p"/sales/#{id}/receipt"})}
+  end
+
+  def handle_event("print_and_new", _, socket) do
+    sale = socket.assigns.done_sale
+
+    {:noreply,
+     socket
+     |> assign(done_sale: nil)
+     |> clear_flash()
+     |> push_event("print_receipt", %{url: ~p"/sales/#{sale.id}/receipt"})}
+  end
+
   def handle_event("new_sale", _, socket) do
     {:noreply, socket |> assign(done_sale: nil) |> clear_flash()}
   end
@@ -320,9 +334,14 @@ defmodule TheMintWeb.PosLive do
 
         <p :if={@last_sale} class="mt-4 text-xs text-zinc-400 text-center">
           Last sale #{@last_sale.id} · {fmt(@last_sale.total_amount)} ·
-          <a href={~p"/sales/#{@last_sale.id}/receipt"} target="_blank" class="underline">
-            Print receipt
-          </a>
+          <button
+            type="button"
+            phx-click="print_receipt"
+            phx-value-id={@last_sale.id}
+            class="underline"
+          >
+            Reprint receipt
+          </button>
         </p>
       </aside>
     </div>
@@ -344,16 +363,20 @@ defmodule TheMintWeb.PosLive do
         <p :if={@done_sale.payment_method == "cash" && @done_sale.amount_paid} class="text-sm mt-2">
           Change: <b>{fmt(Decimal.sub(@done_sale.amount_paid, @done_sale.total_amount))}</b>
         </p>
-        <div class="mt-5 flex gap-2">
-          <a
-            href={~p"/sales/#{@done_sale.id}/receipt"}
-            target="_blank"
-            class="btn-secondary flex-1 inline-flex items-center justify-center gap-1.5"
-          >
-            <.icon name="hero-printer-mini" class="h-4 w-4" /> Print receipt
-          </a>
-          <button phx-click="new_sale" class="btn-primary flex-1">New sale</button>
-        </div>
+        <button
+          id="print-and-new"
+          phx-click="print_and_new"
+          phx-mounted={JS.focus()}
+          class="btn-primary mt-5 w-full py-3 text-base inline-flex items-center justify-center gap-1.5"
+        >
+          <.icon name="hero-printer-mini" class="h-4 w-4" /> Print receipt &amp; new sale
+        </button>
+        <button
+          phx-click="new_sale"
+          class="mt-3 text-xs text-zinc-400 underline hover:text-zinc-600"
+        >
+          Skip receipt
+        </button>
       </div>
     </div>
     """

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Receipt #{@sale.id} · The Mint</title>
     <style>
-      @page { size: 80mm auto; margin: 4mm; }
+      @page { size: 80mm 200mm; margin: 0; }
       * { box-sizing: border-box; }
       body { margin: 0; background: #f4f4f5; color: #111; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; }
       .receipt { width: 80mm; max-width: 100%; margin: 16px auto; background: #fff; padding: 14px; }
@@ -17,7 +17,7 @@
       .total { font-size: 16px; font-weight: 700; }
       .actions { text-align: center; margin: 12px; }
       .actions button { font: inherit; padding: 8px 16px; cursor: pointer; }
-      @media print { body { background: #fff; } .receipt { margin: 0; padding: 0; width: auto; } .actions { display: none; } }
+      @media print { body { background: #fff; } .receipt { margin: 0; padding: 3mm; width: 80mm; } .actions { display: none; } }
     </style>
   </head>
   <body>
@@ -58,6 +58,17 @@
       <button onclick="window.print()">Print</button>
       <button onclick="window.close()">Close</button>
     </div>
+    <style id="page-size"></style>
+    <script>
+      // CSS has no "auto" page height, so size the page to the receipt before printing.
+      function fitPage() {
+        const mm = document.querySelector(".receipt").getBoundingClientRect().height * 25.4 / 96;
+        document.getElementById("page-size").textContent =
+          "@page { size: 80mm " + Math.ceil(mm + 2) + "mm; margin: 0; }";
+      }
+      window.addEventListener("beforeprint", fitPage);
+      fitPage();
+    </script>
     <script :if={@autoprint}>
       window.addEventListener("load", () => window.print());
     </script>

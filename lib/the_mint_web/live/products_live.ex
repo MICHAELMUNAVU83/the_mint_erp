@@ -7,7 +7,10 @@ defmodule TheMintWeb.ProductsLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, page_title: "Products", search: "", filter: "all") |> load()}
+    admin = TheMint.Accounts.User.admin?(socket.assigns.current_user)
+
+    {:ok,
+     assign(socket, page_title: "Products", search: "", filter: "all", admin: admin) |> load()}
   end
 
   defp load(socket),
@@ -20,6 +23,14 @@ defmodule TheMintWeb.ProductsLive do
   defp filtered(products, _), do: products
 
   @impl true
+  def handle_params(_params, _url, %{assigns: %{admin: false, live_action: action}} = socket)
+      when action in [:new, :edit] do
+    {:noreply,
+     socket
+     |> put_flash(:error, "Only admins can add or edit products.")
+     |> push_patch(to: ~p"/products")}
+  end
+
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
@@ -41,6 +52,11 @@ defmodule TheMintWeb.ProductsLive do
   end
 
   def handle_event("filter", %{"filter" => f}, socket), do: {:noreply, assign(socket, filter: f)}
+
+  def handle_event(event, _params, %{assigns: %{admin: false}} = socket)
+      when event in ["validate", "save", "delete"] do
+    {:noreply, put_flash(socket, :error, "Only admins can change products.")}
+  end
 
   def handle_event("validate", %{"product" => params}, socket) do
     cs = Products.change_product(socket.assigns.product, params) |> Map.put(:action, :validate)
@@ -86,8 +102,10 @@ defmodule TheMintWeb.ProductsLive do
     ~H"""
     <.header>
       Products
-      <:subtitle>{length(@products)} products · tap one to edit</:subtitle>
-      <:actions>
+      <:subtitle>
+        {length(@products)} products<span :if={@admin}> · tap one to edit</span>
+      </:subtitle>
+      <:actions :if={@admin}>
         <.link patch={~p"/products/new"} class="btn-primary">
           <.icon name="hero-plus-mini" class="h-4 w-4" /> Add product
         </.link>
@@ -134,10 +152,13 @@ defmodule TheMintWeb.ProductsLive do
         <span class="col-span-2 text-right">Price</span>
         <span class="col-span-2 text-right">Stock</span>
       </div>
-      <.link
+      <div
         :for={p <- @rows}
-        patch={~p"/products/#{p}/edit"}
-        class="grid grid-cols-12 gap-4 items-center px-5 py-3 border-b border-zinc-100 last:border-0 hover:bg-zinc-50 transition"
+        phx-click={@admin && JS.patch(~p"/products/#{p}/edit")}
+        class={[
+          "grid grid-cols-12 gap-4 items-center px-5 py-3 border-b border-zinc-100 last:border-0",
+          @admin && "cursor-pointer hover:bg-zinc-50 transition"
+        ]}
       >
         <div class="col-span-8 sm:col-span-6 min-w-0">
           <p class={["font-medium truncate", !p.is_active && "text-zinc-400"]}>{p.name}</p>
@@ -153,7 +174,7 @@ defmodule TheMintWeb.ProductsLive do
           <p class="text-xs text-emerald-600">+{fmt(Decimal.sub(p.price, p.buying_price))}</p>
         </div>
         <div class="hidden sm:flex col-span-2 justify-end"><.stock qty={p.stock_quantity} /></div>
-      </.link>
+      </div>
       <p :if={@rows == []} class="px-5 py-12 text-center text-sm text-zinc-500">No products here.</p>
     </div>
 
