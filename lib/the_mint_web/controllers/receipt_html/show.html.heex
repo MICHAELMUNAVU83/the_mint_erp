@@ -16,8 +16,9 @@
       .rule { border-top: 1px dashed #999; margin: 8px 0; }
       .total { font-size: 16px; font-weight: 700; }
       .actions { text-align: center; margin: 12px; }
+      .end-mark { margin: 10mm 0 0; }
       .actions button { font: inherit; padding: 8px 16px; cursor: pointer; }
-      @media print { body { background: #fff; } .receipt { margin: 0; padding: 3mm; width: 80mm; } .actions { display: none; } }
+      @media print { body { background: #fff; } .receipt { margin: 0; padding: 3mm 6mm; width: 80mm; } .actions { display: none; } }
     </style>
   </head>
   <body>
@@ -53,6 +54,8 @@
       </div>
       <div class="rule"></div>
       <p class="center">Thank you!</p>
+      <%!-- The printer driver trims trailing blank space, so a visible mark is what keeps room below "Thank you!" --%>
+      <p class="center muted end-mark">* * *</p>
     </div>
     <div class="actions">
       <button onclick="window.print()">Print</button>
@@ -61,10 +64,12 @@
     <style id="page-size"></style>
     <script>
       // CSS has no "auto" page height, so size the page to the receipt before printing.
+      // Keep it taller than 80mm: a page wider than tall is printed as landscape (rotated).
       function fitPage() {
         const mm = document.querySelector(".receipt").getBoundingClientRect().height * 25.4 / 96;
+        const h = Math.max(Math.ceil(mm + 2), 100);
         document.getElementById("page-size").textContent =
-          "@page { size: 80mm " + Math.ceil(mm + 2) + "mm; margin: 0; }";
+          "@page { size: 80mm " + h + "mm; margin: 0; }";
       }
       window.addEventListener("beforeprint", fitPage);
       fitPage();
